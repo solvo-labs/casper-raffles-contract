@@ -11,7 +11,7 @@ use alloc::{
 use crate::{
     error::Error,
     interfaces::cep18::CEP18,
-    utils::{get_current_address, get_key, self , read_from}, events::VestingEvent,
+    utils::{get_current_address, get_key, self , read_from},
     events::emit, enums::Address
 };
 
@@ -36,6 +36,7 @@ const OWNER: &str = "owner";
 const PURSE: &str = "purse";
 const PARTIPICANT_COUNT : &str = "partipiciant_count";
 const PARTIPICANT_DICT : &str = "partipiciant_dict";
+const PARTIPICANT : &str = "partipiciant";
 
 //entry points
 const ENTRY_POINT_DRAW: &str = "draw";
@@ -43,15 +44,32 @@ const ENTRY_POINT_CLAIM: &str = "claim";
 const ENTRY_POINT_DEPOSIT: &str = "deposit";
 const ENTRY_POINT_GET_PRICE: &str = "get_price";
 const ENTRY_POINT_GET_PURSE: &str = "get_purse";
+const ENTRY_POINT_BUY_TICKET: &str = "buy_ticket";
 
 #[no_mangle]
 pub extern "C" fn draw() {}
 
 #[no_mangle]
-pub extern "C" fn get_price() {
-  let price : U512 = utils::read_from(PRICE);
+pub extern "C" fn buy_ticket() {
+  //check end date for raffle
 
-  runtime::ret(CLValue::from_t(price.clone()).unwrap());
+  let partipiciant: Key = runtime::get_named_arg(PARTIPICANT);
+
+  let partipiciant_count : u64 = utils::read_from(PARTIPICANT_COUNT);
+
+  let partipiciant_dict = *runtime::get_key(PARTIPICANT_DICT).unwrap().as_uref().unwrap();
+
+  storage::dictionary_put(partipiciant_dict, &partipiciant_count.to_string(), partipiciant);  
+
+  runtime::put_key(PARTIPICANT_COUNT, storage::new_uref(partipiciant_count.add(1u64)).into());
+}
+
+
+#[no_mangle]
+pub extern "C" fn get_price() {
+  let price: U512 = utils::read_from(PRICE);
+
+  runtime::ret(CLValue::from_t(price).unwrap_or_revert());
 }
 
 #[no_mangle]
@@ -67,7 +85,6 @@ pub extern "C" fn get_purse() {
 
   runtime::ret(CLValue::from_t(raffle_purse.into_add()).unwrap_or_revert());
 }
-
 
 #[no_mangle]
 pub extern "C" fn claim() {
@@ -115,6 +132,7 @@ pub extern "C" fn call() {
   let collection: Key = runtime::get_named_arg(COLLECTION);
   //utils
   let owner : AccountHash = runtime::get_caller().into();
+  let now : u64 = runtime::get_blocktime().into();
   
   let mut named_keys = NamedKeys::new();
 
@@ -166,7 +184,13 @@ pub extern "C" fn call() {
   EntryPointType::Contract,
   );
 
-  let now : u64 = runtime::get_blocktime().into();
+  let buy_ticket_entry_point = EntryPoint::new(
+    ENTRY_POINT_BUY_TICKET,
+    vec![Parameter::new(PARTIPICANT, CLType::Key)],
+    CLType::URef,
+    EntryPointAccess::Public,
+    EntryPointType::Contract,
+    );
 
   let mut entry_points = EntryPoints::new();
   entry_points.add_entry_point(draw_entry_point);
@@ -174,6 +198,7 @@ pub extern "C" fn call() {
   entry_points.add_entry_point(deposit_entry_point);
   entry_points.add_entry_point(get_price_entry_point);
   entry_points.add_entry_point(get_purse_entry_point);
+  entry_points.add_entry_point(buy_ticket_entry_point);
 
   let str1 = name.clone() + "_" + &now.to_string();
   
