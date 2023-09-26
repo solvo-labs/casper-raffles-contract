@@ -51,21 +51,21 @@ pub extern "C" fn draw() {}
 pub extern "C" fn get_price() {
   let price : U512 = utils::read_from(PRICE);
 
-  runtime::ret(CLValue::from_t(price).unwrap());
+  runtime::ret(CLValue::from_t(price.clone()).unwrap());
 }
 
 #[no_mangle]
 pub extern "C" fn get_purse() {
-  let vesting_purse = match runtime::get_key(PURSE) {
+  let raffle_purse = match runtime::get_key(PURSE) {
       Some(purse_key) => purse_key.into_uref().unwrap_or_revert(),
       None => {
           let new_purse = system::create_purse();
           runtime::put_key(PURSE, new_purse.into());
           new_purse
       }
-  };
+  };  
 
-  runtime::ret(CLValue::from_t(vesting_purse).unwrap_or_revert());
+  runtime::ret(CLValue::from_t(raffle_purse.into_add()).unwrap_or_revert());
 }
 
 
@@ -153,7 +153,7 @@ pub extern "C" fn call() {
   let get_price_entry_point = EntryPoint::new(
   ENTRY_POINT_GET_PRICE,
   vec![],
-  CLType::Option(Box::new(CLType::U512)),
+  CLType::U512,
   EntryPointAccess::Public,
   EntryPointType::Contract,
   ); 
@@ -161,18 +161,10 @@ pub extern "C" fn call() {
   let get_purse_entry_point = EntryPoint::new(
   ENTRY_POINT_GET_PURSE,
   vec![],
-  CLType::Option(Box::new(CLType::URef)),
+   CLType::URef,
   EntryPointAccess::Public,
   EntryPointType::Contract,
   );
-
-  let test_entry_point = EntryPoint::new(
-    "test",
-    vec![],
-    CLType::URef,
-    EntryPointAccess::Public,
-    EntryPointType::Contract,
-    );
 
   let now : u64 = runtime::get_blocktime().into();
 
