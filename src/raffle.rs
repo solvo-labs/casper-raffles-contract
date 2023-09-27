@@ -4,9 +4,7 @@ use alloc::{ string::{ String, ToString }, vec::Vec, vec, boxed::Box };
 
 use crate::{
     error::Error,
-    interfaces::cep18::CEP18,
     utils::{ get_current_address, get_key, self, read_from },
-    events::emit,
     enums::Address,
 };
 
@@ -59,7 +57,7 @@ const ENTRY_POINT_BUY_TICKET: &str = "buy_ticket";
 
 #[no_mangle]
 pub extern "C" fn draw() {
-    check_admin_account();
+    // check_admin_account();
     let now: u64 = runtime::get_blocktime().into();
     let end_date: u64 = utils::read_from(END_DATE);
 
@@ -140,8 +138,19 @@ pub extern "C" fn claim() {
 
     let collection_hash: ContractHash = collection.into_hash().map(ContractHash::new).unwrap();
 
-    // change to account with random account hash
-    transfer(collection_hash, contract_address.into(), caller.into(), token_id);
+    let partipiciant_dict = *runtime::get_key(PARTIPICANT_DICT).unwrap().as_uref().unwrap();
+    let winner: u64 = utils::read_from(WINNER);
+
+    let winner_partipiciant: Key = storage
+        ::dictionary_get(partipiciant_dict, &winner.to_string())
+        .unwrap()
+        .unwrap_or_revert_with(Error::WinnerError);
+
+    if winner_partipiciant != Key::Account(caller) {
+        runtime::revert(Error::WinnerError);
+    }
+
+    transfer(collection_hash, contract_address.into(), winner_partipiciant, token_id);
 }
 
 // admin function
