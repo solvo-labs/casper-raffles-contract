@@ -82,7 +82,16 @@ pub extern "C" fn draw() {
 
     let random_winner = hash_number % partipiciant_count;
 
-    runtime::put_key(WINNER, storage::new_uref(random_winner).into())
+    runtime::put_key(WINNER, storage::new_uref(random_winner).into());
+
+    let key = runtime::get_key(PURSE).unwrap_or_revert();
+    let contract_purse: URef = key.into_uref().unwrap_or_revert();
+
+    // let owner = runtime::get_caller();
+    let owner = utils::read_from(OWNER);
+    let balance: U512 = system::get_purse_balance(contract_purse).unwrap_or_revert();
+
+    system::transfer_from_purse_to_account(contract_purse, owner, balance, None).unwrap();
 }
 
 #[no_mangle]
@@ -165,7 +174,7 @@ pub extern "C" fn call() {
     let price: U512 = runtime::get_named_arg(PRICE);
     let collection: Key = runtime::get_named_arg(COLLECTION);
     //utils
-    let owner: AccountHash = runtime::get_caller().into();
+    let owner: AccountHash = runtime::get_caller();
     let now: u64 = runtime::get_blocktime().into();
 
     let mut named_keys = NamedKeys::new();
