@@ -6,6 +6,7 @@ pub enum Error {
     FatalError = 0,
     AdminError = 1,
     TimeError = 2,
+    WinnerError = 3,
 }
 
 impl From<Error> for ApiError {

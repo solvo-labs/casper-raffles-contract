@@ -4,7 +4,9 @@ use alloc::{ string::{ String, ToString }, vec::Vec, vec, boxed::Box };
 
 use crate::{
     error::Error,
+    interfaces::cep18::CEP18,
     utils::{ get_current_address, get_key, self, read_from },
+    events::emit,
     enums::Address,
 };
 
@@ -46,6 +48,7 @@ const PARTIPICANT_COUNT: &str = "partipiciant_count";
 const PARTIPICANT_DICT: &str = "partipiciant_dict";
 const PARTIPICANT: &str = "partipiciant";
 const WINNER: &str = "winner";
+const STORAGE_KEY: &str = "storage_key";
 
 //entry points
 const ENTRY_POINT_DRAW: &str = "draw";
@@ -182,6 +185,7 @@ pub extern "C" fn call() {
     let nft_index: u64 = runtime::get_named_arg(NFT_INDEX);
     let price: U512 = runtime::get_named_arg(PRICE);
     let collection: Key = runtime::get_named_arg(COLLECTION);
+    let storage_key: ContractHash = runtime::get_named_arg(STORAGE_KEY);
     //utils
     let owner: AccountHash = runtime::get_caller();
     let now: u64 = runtime::get_blocktime().into();
@@ -195,6 +199,7 @@ pub extern "C" fn call() {
     named_keys.insert(OWNER.to_string(), storage::new_uref(owner).into());
     named_keys.insert(COLLECTION.to_string(), storage::new_uref(collection).into());
     named_keys.insert(NFT_INDEX.to_string(), storage::new_uref(nft_index).into());
+    named_keys.insert(STORAGE_KEY.to_string(), storage::new_uref(storage_key).into());
 
     let draw_entry_point = EntryPoint::new(
         ENTRY_POINT_DRAW,
@@ -269,6 +274,14 @@ pub extern "C" fn call() {
     );
 
     runtime::put_key(&contract_hash_text.to_string(), contract_hash.into());
+
+    runtime::call_contract::<()>(
+        storage_key,
+        "insert",
+        runtime_args! {
+        "data" => contract_hash.to_string(),
+    }
+    );
 }
 
 fn bytes_to_u64(bytes: &[u8]) -> u64 {
