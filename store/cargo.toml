@@ -1,0 +1,16 @@
+[package]
+name = "raffles_deposit_contract"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies]
+casper-contract = {version = "1.4.4", features = ["test-support"]}
+casper-types = "1.5.0"
+casper_types_derive = "0.1.0"
+
+[[bin]]
+name = "store_contract"
+path = "src/main.rs"
+bench = false
+doctest = false
+test = false
