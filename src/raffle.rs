@@ -6,7 +6,7 @@ use crate::{
     error::Error,
     interfaces::cep18::CEP18,
     utils::{ get_current_address, get_key, self, read_from },
-    events::emit,
+    events::{ emit, RaffleEvent },
     enums::Address,
 };
 
@@ -93,6 +93,8 @@ pub extern "C" fn draw() {
     let balance: U512 = system::get_purse_balance(contract_purse).unwrap_or_revert();
 
     system::transfer_from_purse_to_account(contract_purse, owner, balance, None).unwrap();
+
+    emit(&(RaffleEvent::Draw { winner: random_winner }))
 }
 
 #[no_mangle]
@@ -108,6 +110,8 @@ pub extern "C" fn buy_ticket() {
     storage::dictionary_put(partipiciant_dict, &partipiciant_count.to_string(), partipiciant);
 
     runtime::put_key(PARTIPICANT_COUNT, storage::new_uref(partipiciant_count.add(1u64)).into());
+
+    emit(&(RaffleEvent::BuyTicket { partipiciant }))
 }
 
 #[no_mangle]
@@ -154,6 +158,8 @@ pub extern "C" fn claim() {
     }
 
     transfer(collection_hash, contract_address.into(), winner_partipiciant, token_id);
+
+    emit(&(RaffleEvent::Claim { winner_partipiciant, collection, token_id }));
 }
 
 // admin function
