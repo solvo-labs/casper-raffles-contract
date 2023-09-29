@@ -7,6 +7,8 @@ pub enum Error {
     AdminError = 1,
     TimeError = 2,
     WinnerError = 3,
+    NotApproved = 4,
+    CancelError = 5,
 }
 
 impl From<Error> for ApiError {

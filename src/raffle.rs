@@ -57,6 +57,32 @@ const ENTRY_POINT_DEPOSIT: &str = "deposit";
 const ENTRY_POINT_GET_PRICE: &str = "get_price";
 const ENTRY_POINT_GET_PURSE: &str = "get_purse";
 const ENTRY_POINT_BUY_TICKET: &str = "buy_ticket";
+const ENTRY_POINT_CANCEL: &str = "cancel";
+
+#[no_mangle]
+pub extern "C" fn cancel() {
+    //check end date for raffle
+    check_admin_account();
+
+    let partipiciant_count: u64 = utils::read_from(PARTIPICANT_COUNT);
+    let collection: Key = utils::read_from(COLLECTION);
+    let token_id: u64 = utils::read_from(NFT_INDEX);
+
+    if partipiciant_count > 0 {
+        runtime::revert(Error::CancelError);
+    }
+
+    let now: u64 = runtime::get_blocktime().into();
+
+    let collection_hash: ContractHash = collection.into_hash().map(ContractHash::new).unwrap();
+
+    let caller: AccountHash = runtime::get_caller();
+    let contract_address = get_current_address();
+
+    transfer(collection_hash, contract_address.into(), caller.into(), token_id);
+
+    runtime::put_key(END_DATE, storage::new_uref(now).into());
+}
 
 #[no_mangle]
 pub extern "C" fn draw() {
@@ -174,6 +200,10 @@ pub extern "C" fn deposit() {
 
     let collection_hash: ContractHash = collection.into_hash().map(ContractHash::new).unwrap();
 
+    get_approved(collection_hash, caller.into(), token_id).unwrap_or_revert_with(
+        Error::NotApproved
+    );
+
     // check owner is caller
     transfer(collection_hash, caller.into(), contract_address.into(), token_id);
 
@@ -255,6 +285,14 @@ pub extern "C" fn call() {
         EntryPointType::Contract
     );
 
+    let cancel_entry_point = EntryPoint::new(
+        ENTRY_POINT_CANCEL,
+        vec![],
+        CLType::URef,
+        EntryPointAccess::Public,
+        EntryPointType::Contract
+    );
+
     let mut entry_points = EntryPoints::new();
     entry_points.add_entry_point(draw_entry_point);
     entry_points.add_entry_point(claim_entry_point);
@@ -262,6 +300,7 @@ pub extern "C" fn call() {
     entry_points.add_entry_point(get_price_entry_point);
     entry_points.add_entry_point(get_purse_entry_point);
     entry_points.add_entry_point(buy_ticket_entry_point);
+    entry_points.add_entry_point(cancel_entry_point);
 
     let str1 = name.clone() + "_" + &now.to_string();
 
