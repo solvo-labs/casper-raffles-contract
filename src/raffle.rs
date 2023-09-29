@@ -125,7 +125,17 @@ pub extern "C" fn draw() {
 
 #[no_mangle]
 pub extern "C" fn buy_ticket() {
-    //check end date for raffle
+    let now: u64 = runtime::get_blocktime().into();
+    let end_date: u64 = utils::read_from(END_DATE);
+    let start_date: u64 = utils::read_from(START_DATE);
+
+    if end_date.gt(&now) {
+        runtime::revert(Error::TimeError);
+    }
+
+    if start_date.gt(&now) {
+        runtime::revert(Error::TimeError);
+    }
 
     let partipiciant: Key = runtime::get_named_arg(PARTIPICANT);
 
