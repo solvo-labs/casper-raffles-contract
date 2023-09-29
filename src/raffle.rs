@@ -129,11 +129,11 @@ pub extern "C" fn buy_ticket() {
     let end_date: u64 = utils::read_from(END_DATE);
     let start_date: u64 = utils::read_from(START_DATE);
 
-    if end_date.gt(&now) {
+    if now.gt(&end_date) {
         runtime::revert(Error::TimeError);
     }
 
-    if start_date.gt(&now) {
+    if now.gt(&start_date) {
         runtime::revert(Error::TimeError);
     }
 
