@@ -133,7 +133,7 @@ pub extern "C" fn buy_ticket() {
         runtime::revert(Error::TimeError);
     }
 
-    if now.gt(&start_date) {
+    if start_date.gt(&now) {
         runtime::revert(Error::TimeError);
     }
 
