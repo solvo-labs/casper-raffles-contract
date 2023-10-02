@@ -81,7 +81,7 @@ pub extern "C" fn cancel() {
     let contract_address = get_current_address();
 
     transfer(collection_hash, contract_address.into(), caller.into(), token_id);
-
+    runtime::put_key(CLAIMED, storage::new_uref(true).into());
     runtime::put_key(END_DATE, storage::new_uref(now).into());
 }
 
