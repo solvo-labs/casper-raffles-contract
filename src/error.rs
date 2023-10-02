@@ -9,6 +9,7 @@ pub enum Error {
     WinnerError = 3,
     NotApproved = 4,
     CancelError = 5,
+    DrawExists = 6,
 }
 
 impl From<Error> for ApiError {

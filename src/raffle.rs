@@ -90,9 +90,16 @@ pub extern "C" fn draw() {
     // check_admin_account();
     let now: u64 = runtime::get_blocktime().into();
     let end_date: u64 = utils::read_from(END_DATE);
+    let winner: u64 = utils::read_from(WINNER);
 
     if end_date.gt(&now) {
         runtime::revert(Error::TimeError);
+    }
+
+    let minus_one = -1i64 as u64;
+
+    if winner > minus_one {
+        runtime::revert(Error::DrawExists);
     }
 
     let partipiciant_dict: URef = *runtime::get_key(PARTIPICANT_DICT).unwrap().as_uref().unwrap();
