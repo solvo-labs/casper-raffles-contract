@@ -49,6 +49,7 @@ const PARTIPICANT_DICT: &str = "partipiciant_dict";
 const PARTIPICANT: &str = "partipiciant";
 const WINNER: &str = "winner";
 const STORAGE_KEY: &str = "storage_key";
+const CLAIMED: &str = "claimed";
 
 //entry points
 const ENTRY_POINT_DRAW: &str = "draw";
@@ -194,6 +195,8 @@ pub extern "C" fn claim() {
     }
 
     transfer(collection_hash, contract_address.into(), winner_partipiciant, token_id);
+
+    runtime::put_key(CLAIMED, storage::new_uref(true).into());
 
     emit(&(RaffleEvent::Claim { winner_partipiciant, collection, token_id }));
 }
