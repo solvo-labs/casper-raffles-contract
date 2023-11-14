@@ -1,24 +1,21 @@
-use core::ops::{ Add, Sub, Mul, Div };
+use core::ops::Add;
 
-use alloc::{ string::{ String, ToString }, vec::Vec, vec, boxed::Box };
+use alloc::{ string::{ String, ToString }, vec };
 
 use crate::{
     error::Error,
-    interfaces::cep18::CEP18,
-    utils::{ get_current_address, get_key, self, read_from },
+    utils::{ get_current_address, get_key, self },
     events::{ emit, RaffleEvent },
     enums::Address,
 };
 
 use casper_types::{
     account::AccountHash,
-    U256,
     EntryPoint,
     Key,
     ContractHash,
     EntryPointAccess,
     CLType,
-    Parameter,
     EntryPointType,
     EntryPoints,
     contracts::NamedKeys,
@@ -27,10 +24,10 @@ use casper_types::{
     runtime_args,
     URef,
     CLValue,
+    Parameter,
 };
-use casper_types_derive::{ CLTyped, FromBytes, ToBytes };
 
-use casper_contract::contract_api::{ runtime, storage, system, account };
+use casper_contract::contract_api::{ runtime, storage, system };
 use casper_contract::unwrap_or_revert::UnwrapOrRevert;
 
 use tiny_keccak::{ Sha3, Hasher };
@@ -102,7 +99,7 @@ pub extern "C" fn draw() {
         runtime::revert(Error::DrawExists);
     }
 
-    let partipiciant_dict: URef = *runtime::get_key(PARTIPICANT_DICT).unwrap().as_uref().unwrap();
+    // let partipiciant_dict: URef = *runtime::get_key(PARTIPICANT_DICT).unwrap().as_uref().unwrap();
     let partipiciant_count: u64 = utils::read_from(PARTIPICANT_COUNT);
 
     let input = now.to_string();

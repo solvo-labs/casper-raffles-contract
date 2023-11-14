@@ -1,17 +1,6 @@
-[package]
-name = "raffles_contract"
-version = "0.1.0"
-edition = "2018"
+[workspace]
 
-[dependencies]
-casper-contract = {version = "1.4.4", features = ["test-support"]}
-casper-types = "1.5.0"
-casper_types_derive = "0.1.0"
-tiny-keccak = { version = "2.0", features = ["sha3"] }
-
-[[bin]]
-name = "raffles_contract"
-path = "src/lib.rs"
-bench = false
-doctest = false
-test = false
+members = [
+    "raffle",
+    "raffle_deposit"
+]

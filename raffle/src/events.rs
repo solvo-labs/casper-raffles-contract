@@ -1,7 +1,7 @@
-use crate::{ alloc::string::{ String, ToString }, utils::get_current_address };
+use crate::{ alloc::string::ToString, utils::get_current_address };
 use alloc::{ collections::BTreeMap, vec::Vec };
 use casper_contract::contract_api::storage;
-use casper_types::{ URef, U256, Key, ContractHash };
+use casper_types::{ URef, Key };
 
 pub enum RaffleEvent {
     BuyTicket {

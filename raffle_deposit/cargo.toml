@@ -1,5 +1,5 @@
 [package]
-name = "raffles_deposit_contract"
+name = "raffle_deposit"
 version = "0.1.0"
 edition = "2018"
 
@@ -9,7 +9,7 @@ casper-types = "1.5.0"
 casper_types_derive = "0.1.0"
 
 [[bin]]
-name = "store_contract"
+name = "raffle_deposit"
 path = "src/main.rs"
 bench = false
 doctest = false

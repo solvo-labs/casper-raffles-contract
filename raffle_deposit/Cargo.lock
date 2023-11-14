@@ -443,16 +443,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "def50a86306165861203e7f84ecffbbdfdea79f0e51039b33de1e952358c47ac"
 
 [[package]]
-name = "raffle"
-version = "0.1.0"
-dependencies = [
- "casper-contract",
- "casper-types",
- "casper_types_derive",
- "tiny-keccak",
-]
-
-[[package]]
 name = "raffle_deposit"
 version = "0.1.0"
 dependencies = [
@@ -613,15 +603,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "unicode-ident",
-]
-
-[[package]]
-name = "tiny-keccak"
-version = "2.0.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2c9d3793400a45f954c52e73d068316d76b6f4e36977e3fcebb13a2721e80237"
-dependencies = [
- "crunchy",
 ]
 
 [[package]]
