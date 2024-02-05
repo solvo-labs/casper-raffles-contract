@@ -87,7 +87,13 @@ pub extern "C" fn draw() {
     // check_admin_account();
     let now: u64 = runtime::get_blocktime().into();
     let end_date: u64 = utils::read_from(END_DATE);
-    let winner: u64 = utils::read_from(WINNER);
+
+    match utils::read_from(WINNER) {
+        Ok(value) => {
+            runtime::revert(Error::DrawExists);
+        }
+        Err(_) => todo!(),
+    }
 
     if end_date.gt(&now) {
         runtime::revert(Error::TimeError);
