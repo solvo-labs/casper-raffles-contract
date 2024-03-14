@@ -84,7 +84,8 @@ pub extern "C" fn cancel() {
 
 #[no_mangle]
 pub extern "C" fn draw() {
-    // check_admin_account();
+    check_admin_account();
+
     let now: u64 = runtime::get_blocktime().into();
     let end_date: u64 = utils::read_from(END_DATE);
 
