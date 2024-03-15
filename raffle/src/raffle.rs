@@ -189,19 +189,13 @@ pub extern "C" fn get_purse() {
 
 #[no_mangle]
 pub extern "C" fn claim() {
-    let token_id: u64 = utils::read_from(NFT_INDEX);
-    let collection: Key = utils::read_from(COLLECTION);
     let caller: AccountHash = runtime::get_caller();
-
-    let contract_address = get_current_address();
-
-    let collection_hash: ContractHash = collection.into_hash().map(ContractHash::new).unwrap();
+    let winner: u64 = utils::read_from(WINNER);
 
     let partipiciant_dict = *runtime::get_key(PARTIPICANT_DICT)
         .unwrap()
         .as_uref()
         .unwrap();
-    let winner: u64 = utils::read_from(WINNER);
 
     let winner_partipiciant: Key = storage::dictionary_get(partipiciant_dict, &winner.to_string())
         .unwrap()
@@ -210,6 +204,11 @@ pub extern "C" fn claim() {
     if winner_partipiciant != Key::Account(caller) {
         runtime::revert(Error::WinnerError);
     }
+
+    let contract_address = get_current_address();
+    let token_id: u64 = utils::read_from(NFT_INDEX);
+    let collection: Key = utils::read_from(COLLECTION);
+    let collection_hash: ContractHash = collection.into_hash().map(ContractHash::new).unwrap();
 
     transfer(
         collection_hash,
