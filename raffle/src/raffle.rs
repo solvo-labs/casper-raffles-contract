@@ -60,12 +60,13 @@ pub extern "C" fn cancel() {
     }
 
     let partipiciant_count: u64 = utils::read_from(PARTIPICANT_COUNT);
-    let collection: Key = utils::read_from(COLLECTION);
-    let token_id: u64 = utils::read_from(NFT_INDEX);
 
     if partipiciant_count > 0 {
         runtime::revert(Error::CancelError);
     }
+
+    let collection: Key = utils::read_from(COLLECTION);
+    let token_id: u64 = utils::read_from(NFT_INDEX);
 
     let collection_hash: ContractHash = collection.into_hash().map(ContractHash::new).unwrap();
 
