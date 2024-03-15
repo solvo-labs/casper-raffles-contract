@@ -132,11 +132,12 @@ pub extern "C" fn draw() {
 pub extern "C" fn buy_ticket() {
     let now: u64 = runtime::get_blocktime().into();
     let end_date: u64 = utils::read_from(END_DATE);
-    let start_date: u64 = utils::read_from(START_DATE);
 
     if now.gt(&end_date) {
         runtime::revert(Error::TimeError);
     }
+
+    let start_date: u64 = utils::read_from(START_DATE);
 
     if start_date.gt(&now) {
         runtime::revert(Error::TimeError);
