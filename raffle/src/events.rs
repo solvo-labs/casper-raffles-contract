@@ -1,7 +1,7 @@
-use crate::{ alloc::string::ToString, utils::get_current_address };
-use alloc::{ collections::BTreeMap, vec::Vec };
+use crate::{alloc::string::ToString, utils::get_current_address};
+use alloc::{collections::BTreeMap, vec::Vec};
 use casper_contract::contract_api::storage;
-use casper_types::{ URef, Key };
+use casper_types::{Key, URef};
 
 pub enum RaffleEvent {
     BuyTicket {
@@ -22,7 +22,10 @@ pub fn emit(event: &RaffleEvent) {
     let mut param = BTreeMap::new();
     param.insert(
         "contract_package_hash",
-        get_current_address().as_contract_package_hash().unwrap().to_string()
+        get_current_address()
+            .as_contract_package_hash()
+            .unwrap()
+            .to_string(),
     );
     match event {
         RaffleEvent::BuyTicket { partipiciant } => {
@@ -33,7 +36,11 @@ pub fn emit(event: &RaffleEvent) {
             param.insert("event_type", "draw".to_string());
             param.insert("winner", winner.to_string());
         }
-        RaffleEvent::Claim { winner_partipiciant, collection, token_id } => {
+        RaffleEvent::Claim {
+            winner_partipiciant,
+            collection,
+            token_id,
+        } => {
             param.insert("event_type", "claim".to_string());
             param.insert("winner_partipiciant", winner_partipiciant.to_string());
             param.insert("collection", collection.to_string());
