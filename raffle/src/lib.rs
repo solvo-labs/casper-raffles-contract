@@ -2,8 +2,8 @@
 #![no_main]
 
 extern crate alloc;
+mod enums;
+mod error;
+mod events;
 mod raffle;
 mod utils;
-mod events;
-mod error;
-mod enums;
