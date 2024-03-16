@@ -88,13 +88,16 @@ pub extern "C" fn draw() {
     let now: u64 = runtime::get_blocktime().into();
     let end_date: u64 = utils::read_from(END_DATE);
 
-    //to-do @oguzhaniptes check replace winner
-
     if end_date.gt(&now) {
         runtime::revert(Error::TimeError);
     }
 
-    // let partipiciant_dict: URef = *runtime::get_key(PARTIPICANT_DICT).unwrap().as_uref().unwrap();
+    let winner: Option<u64> = utils::read_from(WINNER);
+    match winner {
+        Some(_value) => runtime::revert(Error::WinnerAlreadyExist),
+        None => {}
+    };
+
     let partipiciant_count: u64 = utils::read_from(PARTIPICANT_COUNT);
 
     let input = now.to_string();
