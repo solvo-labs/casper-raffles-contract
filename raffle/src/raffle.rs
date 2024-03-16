@@ -60,15 +60,14 @@ pub extern "C" fn cancel() {
     }
 
     let partipiciant_count: u64 = utils::read_from(PARTIPICANT_COUNT);
-    let collection: Key = utils::read_from(COLLECTION);
-    let token_id: u64 = utils::read_from(NFT_INDEX);
 
     if partipiciant_count > 0 {
         runtime::revert(Error::CancelError);
     }
 
+    let collection: Key = utils::read_from(COLLECTION);
+    let token_id: u64 = utils::read_from(NFT_INDEX);
     let collection_hash: ContractHash = collection.into_hash().map(ContractHash::new).unwrap();
-
     let caller: AccountHash = runtime::get_caller();
     let contract_address = get_current_address();
 
@@ -237,7 +236,6 @@ pub extern "C" fn deposit() {
     let caller: AccountHash = runtime::get_caller();
     let token_id: u64 = utils::read_from(NFT_INDEX);
     let collection: Key = utils::read_from(COLLECTION);
-
     let collection_hash: ContractHash = collection.into_hash().map(ContractHash::new).unwrap();
 
     get_approved(collection_hash, caller.into(), token_id)
